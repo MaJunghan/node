@@ -17,11 +17,11 @@ mongoose.connect(config.mongoURI, {
 
 app.get('/', (req, res) => res.send('hello world ㅋㅋㅋㅋㅋㅋㅋㅋ'))
 
+
 app.post('/register', (req , res) =>  {
   // 회원가입할때 데이터받아와서 저장
   const user = new User(req.body) 
-
-  //몽고 db에서 오는메서드
+  // body에서 값을받아와서 세이브되기전에 암호화를 해야함.  
   user.save((err, userInfo) => {
     if(err) return res.json({ success: false, err})
     return res.status(200).json({
