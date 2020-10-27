@@ -125,4 +125,6 @@ console.log(rectangle instanceof Rectangle);
 console.log(triangle instanceof Rectangle);
 console.log(triangle instanceof Triangle);
 console.log(rectangle instanceof Object);
+// 오브젝트는 클래스의 최상위클래스 : 오브젝트의 내부메서드를 상속받아서
+// 재정의해서 사용할수도있음.
 
