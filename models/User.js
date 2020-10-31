@@ -56,6 +56,11 @@ userSchema.pre('save', function( next ){
     }
 })
 
+
+
+
+
+
 const User = mongoose.model('User', userSchema) // 스키마를 다만들었으면 모델에 유저스키마를 담는다.
 
 
