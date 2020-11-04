@@ -1,0 +1,16 @@
+<!--
+여기프로젝트에선 data폴더의 내용들을 읽어서 자동으로 리스트에 추가해주는데 
+본인이아닌 다른사람이 이렇게 추가해주려면 어떻게해야하나 ?
+폼으로 전송해서 data폴더안의 파일을만들어야한다.
+
+-->
+
+
+<!--from 제일위에 액션:전송할주소와 방식을선택가능 (get, post ) -->
+<form action="http://localhost:3000/process_create" method="post" >
+    <p><input type="text" name="title"></p>
+    <p><textarea name="description"></textarea></p>
+    <p><input type="submit"></input></p> 
+    <!--서브밋 버튼을 누를시 전송 => action주소로 -->
+</form>
+
