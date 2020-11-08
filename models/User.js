@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { JsonWebTokenError } = require('jsonwebtoken');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken');
  
 const userSchema = mongoose.Schema({
     name: {
@@ -32,34 +34,49 @@ const userSchema = mongoose.Schema({
         type: Number
     }
 })
-// pre: save되기전에 이게되서다끝나면 save가실행되고 next의 값이 같이넘어감.
+// 정보들을 유저모델을 저장하기 전에 실행해줌.
 userSchema.pre('save', function( next ){
-    // user 스키마를 가르키는것임 this
-    var user = this;
-    
-    // 비밀번호를 변경할떄만
-    if (user.isModified('password')) {
-    // 비밀번호를 암호화 시킨다.
-        // 에러가 나면 index.js의 err로 보내주고
-        bcrypt.genSalt(saltRounds,function(err, salt){
-            if(err) return next(err) 
+    var user = this; // userSchema를 가리키게 됨.
 
-            // 성공했으면 hash한값을 보내주는것.    
-            bcrypt.hash(user.password, salt, function(err, hash){
-                if(err) return next(err)
-                user.password = hash
-                next()
-             })
-        })
-    } else{
-        next()
+    if(user.isModified('password')){ // 비밀번호가 바뀔 때만 암호화
+        // 비밀번호 암호화
+        bcrypt.genSalt(saltRounds, function(err, salt) { // Salt 생성
+            if(err) return next(err);
+            bcrypt.hash(user.password, salt, function (err, hash){
+                if(err) return next(err);
+                // Store hash in you password DB
+                user.password = hash // 암호화된 비밀번호로 교체
+                next(); // 다음꺼 실행(유저모델 저장)
+            });
+        });
+    } else { // 비밀번호가 아닌 다른정보 바꿀시 그냥 넘어감(next())
+        next();
     }
-})
+});
 
+// 메소드 제작
+userSchema.methods.comparePassword = function(plainPassword, cb) { // cb는 callback function
 
+    // plainPassword 1234567    암호화된 비밀번호 $23243n2oidsoidnf232o3ifnwenif
+    // plainPassword 암호화해서 DB password와 비교
+    bcrypt.compare(plainPassword, this.password, function(err, isMatch){
+        if(err) return cb(err); // 비밀번호가 같지 않다.
+        cb(null, isMatch); // 비밀번호가 같다. -> isMatch = True
+    });
+};
 
-
-
+userSchema.methods.generateToken = function(cb) {
+    
+    var user = this;
+    // jsonwebtoken을 이용해서 token을 생성하기
+    var token = jwt.sign(user._id.toHexString(), 'secretToken'); // user._id + 'secretToken' = token
+    // user에 토큰 넣어주기
+    user.token = token
+    user.save(function(err, user) {
+        if(err) return cb(err);
+        cb(null, user);
+    });
+};
 
 const User = mongoose.model('User', userSchema) // 스키마를 다만들었으면 모델에 유저스키마를 담는다.
 
