@@ -75,8 +75,25 @@ userSchema.methods.generateToken = function(cb) {
     user.save(function(err, user) {
         if(err) return cb(err);
         cb(null, user);
-    });
+    }); 
 };
+
+// auth의 미들웨어 
+userSchema.statics.findByToken = function(token, cb) {
+    var user = this; // user 스키마
+
+    // 토큰을 decod = 복호화 압축을푼다
+    // token에서 secretToken => user._id 반환 decoded로
+    jwt.verify(token, 'secretToken', function(err, decoded){
+        // 유저 id를 이용해서 유저를 찾은 다음에
+        // 클라이언트에서 가져온 token과 db보관된 token이 일치하는지확인
+        
+        user.findOne({ "_id": decoded, "token": token}, function(err, user){
+            if (err) return cb(err);
+            cb(null, user);    
+        })
+    })
+}
 
 const User = mongoose.model('User', userSchema) // 스키마를 다만들었으면 모델에 유저스키마를 담는다.
 
