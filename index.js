@@ -66,32 +66,30 @@ app.post('/api/users/login', (req, res) => {
 // auth.js에서 user와 id를 req에 저장해놔서 바로 저렇게 밑에서 사용할수있는것.
 // 이렇게 라우터를 만들어놓으면 어느페이지에서 user정보와 id를 가지고있어서
 // 사용할수가있음.
-app.get('/api/users/auth', auth, (req,res) => {
-  
-  // 여기까지 미들웨어를 통과해서왔다는 이야기는 auth가 통과했다라는말.
-  res.status(200).json({
-    _id: req.user._id,
-    isAdmin: req.user.role === 0 ? flase : true,
-    isAuth: true,
-    email: req.user.email,
-    name: req.user.name,
-    lastname: req.user.lastname,
-    role: req.user.role,
-    image: req.user.image
-  })
-})
+app.get('/api/users/auth', auth, (req, res) => { // auth라는 미들웨어 추가. 엔드포인트에서 request받고 callback전에 중간 처리.
 
-app.get('api/users/logout', auth, (req, res) => {
-  User.findOneAndUpdate({ _id: req.user._id },
-    {token: ""}
-    , (err, user ) => {
-      if (err) return res.json({ success: flase, err });
+  // 여기가지 미들웨어를 통과해 왔다는 얘기는 Authentication이 True 라는 말.
+  res.status(200).json({
+      _id: req.user._id, // auth 미들웨어 통해 가져왔기 때문에 사용 가능
+      isAdmin: req.user.role === 0 ? false : true, // role : 0 -> 일반유저
+      isAuth: true,
+      email: req.user.email,
+      name: req.user.name,
+      lastname: req.user.lastname,
+      role: req.user.role,
+      image: req.user.image
+  });
+});
+
+app.get('/api/users/logout', auth, (req, res) => {
+
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, user) => {
+      if (err) return res.json({ success: false, err });
       return res.status(200).send({
-        success: true
+          success: true
       })
-    })
+  })
 })
-
 
 
 
