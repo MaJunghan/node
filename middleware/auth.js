@@ -1,5 +1,5 @@
-const {User} = require('./models/User');
 
+const {User} = require("./models/User");
 
 let auth = (req, res, next) => {
     // 인증처리를 하는곳.
@@ -8,6 +8,7 @@ let auth = (req, res, next) => {
     let token = req.cookies.x_auth;
 
     // 토큰을 복호화한후 user._id를찾는다
+    
     User.findByToken(token, (err, user) => {
         // user가 없으면 
         if (err) throw err;
