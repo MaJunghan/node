@@ -41,8 +41,53 @@ promise
 const fetchNumber = new Promise((resolve, reject) =>{
     setTimeout(() => resolve(1), 1000); // resolve에 1을전달
 })
-/*
+
 fetchNumber
     .then(num => num *2 )
     .then(num => num *3 )
-    */
+    .then(num => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => resolve(num -1), 1000);
+        })
+    })
+    .then(num => console.log(num));
+
+// 이처럼 then은 promise의 값을바로처리할수도있지만,
+// 받아서 다시 여러가지를 묶어서 처리할수도있음.
+
+
+
+// 4. Error handling 에러 핸들링
+const getHen = () =>
+    new Promise((resolve, reject) =>{
+        setTimeout(() => resolve('닭'), 1000);
+    });
+const getEgg = hen =>
+new Promise((resolve, reject) =>{
+    setTimeout(() => reject(new Error(`error발생!! ${hen} => egg`)), 1000);
+});
+const cook = egg =>
+new Promise((resolve, reject) =>{
+    setTimeout(() => resolve(`${egg} => pen`), 1000);
+});
+
+
+/*
+이렇게 콜백함수를 전달할때 받아오는벨류를 같은값을할떄 같은벨류 생략가능.
+getHen()
+    .then(hen => getEgg(hen))
+    .then(egg => cook(egg))
+    .then(meal => console.log(meal));
+
+getHen() // 닭을받아서 닭이 알을낳고 그알은 달걀프라이
+    .then(getEgg)
+    .then(cook)
+    .then(console.log);
+*/
+getHen() // 이런식으로 해당 promist의값을 catch로 에러 핸들링가능
+    .then(getEgg)
+    .catch(error =>{
+        return '빵';
+    })
+    .then(cook)
+    .then(console.log);
