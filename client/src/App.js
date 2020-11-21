@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          리액트 실행했자너~~
+          hello 리액트~~
         </p>
         <a
           className="App-link"
